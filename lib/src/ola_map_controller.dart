@@ -1,13 +1,21 @@
 import 'package:flutter/services.dart';
 import 'package:ola_maps_flutter_plugin/ola_maps_flutter_plugin.dart';
 
-class OlaMapController {
+abstract class OlaMapController {
+  Future<double> getZoomLevel();
+}
+
+class OlaMapControllerInternal implements OlaMapController {
   final MethodChannel _methodChannel;
-  OlaMapController.init(int id, String apiKey, Function(LatLng)? onTap)
+
+  OlaMapControllerInternal.init(
+      int id, Function(LatLng)? onTap, LatLng initialPosition)
       : _methodChannel = MethodChannel("ola_maps_flutter_plugin_$id") {
-    _initializeData(apiKey);
     _methodChannel.setMethodCallHandler((call) {
       switch (call.method) {
+        case "onMapReady":
+          showCurrentPosition();
+          break;
         case "onTap":
           onTap?.call(
             LatLng(
@@ -23,7 +31,13 @@ class OlaMapController {
     });
   }
 
-  Future<void> _initializeData(String apiKey) {
-    return _methodChannel.invokeMethod("initializeData", {"apiKey": apiKey});
+  Future<void> showCurrentPosition() {
+    return _methodChannel.invokeMethod("showCurrentLocation", null);
+  }
+
+  @override
+  Future<double> getZoomLevel() async {
+    final data = await _methodChannel.invokeMethod("getZoomLevel");
+    return Future.value(data);
   }
 }

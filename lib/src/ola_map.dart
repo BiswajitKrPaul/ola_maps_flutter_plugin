@@ -1,20 +1,34 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:ola_maps_flutter_plugin/src/constants.dart';
 import 'package:ola_maps_flutter_plugin/src/ola_map_controller.dart';
 import 'package:ola_maps_flutter_plugin/src/types.dart';
 
-class OlaMap extends StatelessWidget {
+class OlaMap extends StatefulWidget {
   const OlaMap({
     super.key,
     required this.onMapCreated,
     required this.apiKey,
+    required this.initialPosition,
     this.onTap,
+    this.showCurrentLocation = true,
   });
 
   final OlaMapCreatedCallback onMapCreated;
   final String apiKey;
   final Function(LatLng latLng)? onTap;
+  final LatLng initialPosition;
+  final bool showCurrentLocation;
+
+  @override
+  State<OlaMap> createState() => _OlaMapState();
+}
+
+class _OlaMapState extends State<OlaMap> {
+  final Completer<OlaMapControllerInternal> _controller = Completer();
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +36,17 @@ class OlaMap extends StatelessWidget {
       case TargetPlatform.android:
         return AndroidView(
           viewType: Constants.viewType,
-          onPlatformViewCreated: _onPlatformViewCreated,
+          onPlatformViewCreated: (id) {
+            final controller = OlaMapControllerInternal.init(
+                id, widget.onTap, widget.initialPosition);
+            _controller.complete(controller);
+            _onPlatformViewCreated(id);
+          },
+          creationParams: {
+            "apiKey": widget.apiKey,
+            "initialPosition": widget.initialPosition.toMap(),
+          },
+          creationParamsCodec: const StandardMessageCodec(),
         );
       case TargetPlatform.iOS:
         return UiKitView(
@@ -40,6 +64,8 @@ class OlaMap extends StatelessWidget {
     }
   }
 
-  void _onPlatformViewCreated(int id) =>
-      onMapCreated(OlaMapController.init(id, apiKey, onTap));
+  void _onPlatformViewCreated(int id) async {
+    final controller = await _controller.future;
+    widget.onMapCreated(controller);
+  }
 }
