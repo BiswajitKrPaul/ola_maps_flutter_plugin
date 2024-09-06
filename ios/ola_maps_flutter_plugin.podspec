@@ -15,11 +15,33 @@ A new Flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
+#  s.vendored_frameworks = 'OlaMaps/MapLibre.xcframework'
+#  s.vendored_frameworks = 'OlaMaps/MoEngageAnalytics.xcframework'
+#  s.vendored_frameworks = 'OlaMaps/MoEngageMessaging.xcframework'
+#  s.vendored_frameworks = 'OlaMaps/MoEngageCore.xcframework'
+#  s.vendored_frameworks = 'OlaMaps/MoEngageObjCUtils.xcframework'
+#  s.vendored_frameworks = 'OlaMaps/MoEngageSDK.xcframework'
+#  s.vendored_frameworks = 'OlaMaps/MoEngageSecurity.xcframework'
+#  s.vendored_frameworks = 'OlaMaps/OlaMapCore.xcframework'
+#  
   s.platform = :ios, '12.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'
+  
+#  s.preserve_paths = 'xxxxxx.xcframework/**/*'
+#    s.xcconfig = { 'OTHER_LDFLAGS' => '-framework xxxxxx' }
+#    s.vendored_frameworks = 'xxxxxx.xcframework'
+  
+  s.preserve_paths = ['MapLibre.xcframework/**/*', 'MoEngageAnalytics.xcframework/**/*','MoEngageMessaging.xcframework/**/*', 'MoEngageCore.xcframework/**/*','MoEngageObjCUtils.xcframework/**/*',
+  'MoEngageSDK.xcframework/**/*','MoEngageSecurity.xcframework/**/*','OlaMapCore.xcframework/**/*']
+    s.xcconfig = { 'OTHER_LDFLAGS' => ['-framework MapLibre', '-framework MoEngageAnalytics',
+    '-framework MoEngageMessaging',
+    '-framework MoEngageCore','-framework MoEngageObjCUtils','-framework MoEngageSDK',
+    '-framework MoEngageSecurity','-framework OlaMapCore'] }
+    s.vendored_frameworks = ['MapLibre.xcframework', 'MoEngageAnalytics.xcframework','MoEngageMessaging.xcframework','MoEngageCore.xcframework',
+    'MoEngageObjCUtils.xcframework','MoEngageSDK.xcframework','MoEngageSecurity.xcframework','OlaMapCore.xcframework']
 
   # If your plugin requires a privacy manifest, for example if it uses any
   # required reason APIs, update the PrivacyInfo.xcprivacy file to describe your

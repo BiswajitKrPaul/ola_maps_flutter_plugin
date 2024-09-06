@@ -50,8 +50,21 @@ class _OlaMapState extends State<OlaMap> {
         );
       case TargetPlatform.iOS:
         return UiKitView(
-          viewType: "",
-          onPlatformViewCreated: _onPlatformViewCreated,
+          viewType: Constants.viewType,
+          onPlatformViewCreated: (id) {
+            final controller = OlaMapControllerInternal.init(
+              id,
+              widget.onTap,
+              widget.initialPosition,
+            );
+            _controller.complete(controller);
+            _onPlatformViewCreated(id);
+          },
+          creationParams: {
+            "apiKey": widget.apiKey,
+            "initialPosition": widget.initialPosition.toMap(),
+          },
+          creationParamsCodec: const StandardMessageCodec(),
         );
       case TargetPlatform.fuchsia:
         throw UnimplementedError();

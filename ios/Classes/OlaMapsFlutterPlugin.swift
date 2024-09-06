@@ -1,19 +1,10 @@
 import Flutter
 import UIKit
+import MapLibre
 
 public class OlaMapsFlutterPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "ola_maps_flutter_plugin", binaryMessenger: registrar.messenger())
-    let instance = OlaMapsFlutterPlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
-  }
-
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    switch call.method {
-    case "getPlatformVersion":
-      result("iOS " + UIDevice.current.systemVersion)
-    default:
-      result(FlutterMethodNotImplemented)
-    }
+      let instance = OlaMapPlatformViewFactory(messenger: registrar.messenger())
+    registrar.register(instance, withId: "com.goapptiv.ola_maps_flutter_plugin.OlaMap")
   }
 }

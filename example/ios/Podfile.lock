@@ -1,5 +1,7 @@
 PODS:
   - Flutter (1.0.0)
+  - geolocator_apple (1.2.0):
+    - Flutter
   - integration_test (0.0.1):
     - Flutter
   - ola_maps_flutter_plugin (0.0.1):
@@ -7,12 +9,15 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - ola_maps_flutter_plugin (from `.symlinks/plugins/ola_maps_flutter_plugin/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  geolocator_apple:
+    :path: ".symlinks/plugins/geolocator_apple/ios"
   integration_test:
     :path: ".symlinks/plugins/integration_test/ios"
   ola_maps_flutter_plugin:
@@ -20,9 +25,10 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  geolocator_apple: 6cbaf322953988e009e5ecb481f07efece75c450
   integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
-  ola_maps_flutter_plugin: 1d0c6d288e3b0719b4b84d3fbacc9a3d4fcebe23
+  ola_maps_flutter_plugin: 7fe700af946fbdb7e4ccb42255dce5279f73c7df
 
-PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
+PODFILE CHECKSUM: e6b2dba38535b009131f5756ccb99201c61aab6d
 
 COCOAPODS: 1.13.0
