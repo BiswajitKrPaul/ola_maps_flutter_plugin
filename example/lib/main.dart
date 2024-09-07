@@ -18,8 +18,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final Completer<OlaMapController> _controller = Completer<OlaMapController>();
 
-  LatLng initialPos =
-      LatLng(latitude: 37.42796133580664, longitude: -122.085749655962);
+  LatLng initialPos = LatLng(latitude: 17.4774271, longitude: 78.4169806);
 
   @override
   void initState() {
@@ -40,17 +39,37 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: OlaMap(
-          onMapCreated: (controller) {
-            _controller.complete(controller);
-          },
-          apiKey: "QXf3Ej8J6fpZAe58vxXl4uL5bNBL2CEVf5X34TPE",
-          onTap: (data) async {
-            final controller = await _controller.future;
-            final data = await controller.getZoomLevel();
-            print(data);
-          },
-          initialPosition: initialPos,
+        body: Column(
+          children: [
+            Expanded(
+              child: OlaMap(
+                onMapCreated: (controller) {
+                  _controller.complete(controller);
+                },
+                apiKey: "YOUR API KEY",
+                onTap: (data) async {
+                  final controller = await _controller.future;
+                  controller.addMarker(data);
+                },
+                initialPosition: initialPos,
+                showCurrentLocation: false,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                var currentPos = await Geolocator.getLastKnownPosition();
+                currentPos ??= await Geolocator.getCurrentPosition();
+
+                final controller = await _controller.future;
+                controller.moveCameraToLatLong(
+                  LatLng(
+                      latitude: currentPos.latitude,
+                      longitude: currentPos.longitude),
+                );
+              },
+              child: const Text("Locate Me"),
+            )
+          ],
         ),
       ),
     );

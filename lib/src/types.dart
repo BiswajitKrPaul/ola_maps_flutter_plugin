@@ -17,7 +17,7 @@ class LatLng {
     };
   }
 
-  factory LatLng.fromMap(Map<String, dynamic> map) {
+  factory LatLng.fromMap(Map map) {
     return LatLng(
       latitude: map['latitude'] as double,
       longitude: map['longitude'] as double,

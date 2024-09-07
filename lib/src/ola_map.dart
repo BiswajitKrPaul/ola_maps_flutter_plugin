@@ -14,7 +14,7 @@ class OlaMap extends StatefulWidget {
     required this.apiKey,
     required this.initialPosition,
     this.onTap,
-    this.showCurrentLocation = true,
+    this.showCurrentLocation = false,
   });
 
   final OlaMapCreatedCallback onMapCreated;
@@ -38,9 +38,8 @@ class _OlaMapState extends State<OlaMap> {
           viewType: Constants.viewType,
           onPlatformViewCreated: (id) {
             final controller = OlaMapControllerInternal.init(
-                id, widget.onTap, widget.initialPosition);
+                id, widget.initialPosition, widget);
             _controller.complete(controller);
-            _onPlatformViewCreated(id);
           },
           creationParams: {
             "apiKey": widget.apiKey,
@@ -53,12 +52,8 @@ class _OlaMapState extends State<OlaMap> {
           viewType: Constants.viewType,
           onPlatformViewCreated: (id) {
             final controller = OlaMapControllerInternal.init(
-              id,
-              widget.onTap,
-              widget.initialPosition,
-            );
+                id, widget.initialPosition, widget);
             _controller.complete(controller);
-            _onPlatformViewCreated(id);
           },
           creationParams: {
             "apiKey": widget.apiKey,
@@ -75,10 +70,5 @@ class _OlaMapState extends State<OlaMap> {
       case TargetPlatform.windows:
         throw UnimplementedError();
     }
-  }
-
-  void _onPlatformViewCreated(int id) async {
-    final controller = await _controller.future;
-    widget.onMapCreated(controller);
   }
 }
