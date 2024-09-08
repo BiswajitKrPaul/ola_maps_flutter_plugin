@@ -62,9 +62,12 @@ class _MyAppState extends State<MyApp> {
 
                 final controller = await _controller.future;
                 controller.moveCameraToLatLong(
-                  LatLng(
+                  CameraUpdate(
+                    target: LatLng(
                       latitude: currentPos.latitude,
-                      longitude: currentPos.longitude),
+                      longitude: currentPos.longitude,
+                    ),
+                  ),
                 );
               },
               child: const Text("Locate Me"),

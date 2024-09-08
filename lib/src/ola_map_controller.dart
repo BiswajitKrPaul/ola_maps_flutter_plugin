@@ -4,7 +4,7 @@ import 'package:ola_maps_flutter_plugin/ola_maps_flutter_plugin.dart';
 import 'package:ola_maps_flutter_plugin/src/constants.dart';
 
 abstract class OlaMapController {
-  void moveCameraToLatLong(LatLng latlng);
+  void moveCameraToLatLong(CameraUpdate latlng);
   void showCurrentLocation();
   void hideCurrentLocation();
   Future<double> getZoomLevel();
@@ -22,8 +22,8 @@ class OlaMapControllerInternal implements OlaMapController {
     eventChannel.receiveBroadcastStream().listen(
           (dynamic data) {
             if (data != null) {
-              final recievedData = data as Map<dynamic, dynamic>;
-              if (recievedData["event_type"] == EventTypes.onMapReady.name) {
+              final receivedData = data as Map<dynamic, dynamic>;
+              if (receivedData["event_type"] == EventTypes.onMapReady.name) {
                 mapRef.onMapCreated(this);
                 if (mapRef.showCurrentLocation) {
                   showCurrentLocation();
@@ -31,9 +31,13 @@ class OlaMapControllerInternal implements OlaMapController {
                   hideCurrentLocation();
                 }
               }
-              if (recievedData["event_type"] == EventTypes.onMapClick.name) {
-                var latlng = LatLng.fromMap(recievedData["data"] as Map);
+              if (receivedData["event_type"] == EventTypes.onMapClick.name) {
+                var latlng = LatLng.fromMap(receivedData["data"] as Map);
                 mapRef.onTap?.call(latlng);
+              }
+
+              if (receivedData["event_type"] == EventTypes.onMapMove.name) {
+                mapRef.onMapMove?.call();
               }
             }
           },
@@ -66,7 +70,10 @@ class OlaMapControllerInternal implements OlaMapController {
   }
 
   @override
-  Future<void> moveCameraToLatLong(LatLng latlng) {
-    return methodChannel.invokeMethod("moveCameraToLatLong", latlng.toMap());
+  Future<void> moveCameraToLatLong(CameraUpdate cameraUpdate) {
+    return methodChannel.invokeMethod(
+      "moveCameraToLatLong",
+      cameraUpdate.toMap(),
+    );
   }
 }

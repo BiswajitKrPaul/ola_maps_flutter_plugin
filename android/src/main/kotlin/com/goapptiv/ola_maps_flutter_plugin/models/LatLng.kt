@@ -1,13 +1,11 @@
 package com.goapptiv.ola_maps_flutter_plugin.models
 
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class LatLng(val latitude: Double, val longitude: Double) {
     companion object {
-        fun from(plating: Map<*, *>): LatLng {
+        fun from(latlng: Map<*, *>): LatLng {
             return LatLng(
-                latitude = plating["latitude"] as Double, longitude = plating["longitude"] as Double
+                latitude = latlng["latitude"] as Double, longitude = latlng["longitude"] as Double
             )
         }
     }

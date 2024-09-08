@@ -7,9 +7,12 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.View
+import com.goapptiv.ola_maps_flutter_plugin.models.CameraUpdate
 import com.goapptiv.ola_maps_flutter_plugin.models.EventTypes
 import com.goapptiv.ola_maps_flutter_plugin.models.LatLng
+import com.goapptiv.ola_maps_flutter_plugin.models.OlaMapConfigurations
 import com.ola.mapsdk.camera.MapControlSettings
+import com.ola.mapsdk.interfaces.MarkerEventListener
 import com.ola.mapsdk.interfaces.OlaMapCallback
 import com.ola.mapsdk.listeners.OlaMapsListenerManager
 import com.ola.mapsdk.model.OlaLatLng
@@ -26,7 +29,10 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.platform.PlatformView
 
 class FlutterOlaMapView internal constructor(
-    context: Context, messenger: BinaryMessenger, viewId: Int, apiKey: String, latLng: LatLng
+    context: Context,
+    messenger: BinaryMessenger,
+    viewId: Int,
+    olaMapConfigurations: OlaMapConfigurations
 ) : PlatformView, MethodCallHandler, StreamHandler {
 
     @SuppressLint("InflateParams")
@@ -43,9 +49,7 @@ class FlutterOlaMapView internal constructor(
 
     private val TAG: String = "FlutterMapView"
 
-    private val initialPos: LatLng = latLng
-
-    private val ctx: Context = context
+    private val initialPos: LatLng = olaMapConfigurations.initialPosition
 
     override fun getView(): View {
         return olaMapView
@@ -53,11 +57,16 @@ class FlutterOlaMapView internal constructor(
 
     init {
         val mapControlSettings =
-            MapControlSettings.Builder().setCompassEnabled(false).setRotateGesturesEnabled(false)
-                .setTiltGesturesEnabled(false).build()
+            MapControlSettings.Builder().setCompassEnabled(olaMapConfigurations.setCompassEnabled)
+                .setRotateGesturesEnabled(olaMapConfigurations.setRotateGesturesEnabled)
+                .setTiltGesturesEnabled(olaMapConfigurations.setTiltGesturesEnabled)
+                .setZoomGesturesEnabled(olaMapConfigurations.setZoomGesturesEnabled)
+                .setDoubleTapGesturesEnabled(olaMapConfigurations.setDoubleTapGesturesEnabled)
+                .build()
         olaMapView.getMap(
-            apiKey, olaMapCallback = object : OlaMapCallback {
+            olaMapConfigurations.apiKey, olaMapCallback = object : OlaMapCallback {
                 override fun onMapError(error: String) {
+                    eventSink?.error("map_error", error, error)
                 }
 
                 override fun onMapReady(olaMap: OlaMap) {
@@ -74,13 +83,20 @@ class FlutterOlaMapView internal constructor(
                     // Set Up of all Event Listeners
                     olaMap.setOnMapClickedListener(getMapClickListener())
                     olaMap.setOnMapMoveListener(getMapMovedListener())
-
-
+                    olaMap.setMarkerListener(getMapMarkerListener())
                 }
             }, mapControlSettings
         )
         methodChannel.setMethodCallHandler(this)
         eventChannel.setStreamHandler(this)
+    }
+
+    private fun getMapMarkerListener(): MarkerEventListener {
+        return object : MarkerEventListener {
+            override fun onMarkerClicked(markerId: String) {
+                println(markerId)
+            }
+        }
     }
 
     fun getMapMovedListener(): OlaMapsListenerManager.OnOlaMapMovedListener {
@@ -124,7 +140,6 @@ class FlutterOlaMapView internal constructor(
         when (call.method) {
             "showCurrentLocation" -> {
                 map?.showCurrentLocation()
-//                map?.moveCameraToLatLong(olaLatLng = map!!.getCurrentLocation(), zoomLevel = 15.0)
             }
 
             "hideCurrentLocation" -> {
@@ -132,11 +147,13 @@ class FlutterOlaMapView internal constructor(
             }
 
             "moveCameraToLatLong" -> {
-                var args = call.arguments as Map<*, *>
-                val latLng: LatLng = LatLng.from(args)
+                val args = call.arguments as Map<*, *>
+                val cameraUpdate: CameraUpdate = CameraUpdate.fromMap(args)
                 map?.moveCameraToLatLong(
-                    olaLatLng = OlaLatLng(latitude = latLng.latitude, longitude = latLng.longitude),
-                    zoomLevel = map?.getCurrentOlaCameraPosition()?.zoomLevel ?: 15.0
+                    olaLatLng = OlaLatLng(
+                        latitude = cameraUpdate.target.latitude,
+                        longitude = cameraUpdate.target.longitude
+                    ), zoomLevel = cameraUpdate.zoomLevel, durationMs = cameraUpdate.durationInMs
                 )
             }
 
@@ -161,23 +178,6 @@ class FlutterOlaMapView internal constructor(
                 result.success(currentCameraPosition?.zoomLevel)
             }
         }
-    }
-
-    private fun drawableToBitmap(drawable: Drawable): Bitmap {
-
-
-        // Create a Bitmap with the same size as the Drawable
-        val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-
-
-        // Set the bounds and draw the Drawable onto the Canvas
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-
-        return bitmap
     }
 
     private fun moveToInitialPosition() {
