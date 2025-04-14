@@ -1,21 +1,23 @@
-package com.goapptiv.ola_maps_flutter_plugin
+package `in`.haxon420.ola_maps_flutter_plugin
 
 import android.content.Context
 import android.util.Log
 import android.view.View
-import com.goapptiv.ola_maps_flutter_plugin.models.CameraUpdate
-import com.goapptiv.ola_maps_flutter_plugin.models.EventTypes
-import com.goapptiv.ola_maps_flutter_plugin.models.LatLng
-import com.goapptiv.ola_maps_flutter_plugin.models.MarkerOptions
-import com.goapptiv.ola_maps_flutter_plugin.models.OlaMapConfigurations
 import com.ola.mapsdk.camera.MapControlSettings
 import com.ola.mapsdk.interfaces.MarkerEventListener
 import com.ola.mapsdk.interfaces.OlaMapCallback
 import com.ola.mapsdk.listeners.OlaMapsListenerManager
 import com.ola.mapsdk.model.OlaLatLng
 import com.ola.mapsdk.model.OlaMarkerOptions
+import com.ola.mapsdk.view.Marker
 import com.ola.mapsdk.view.OlaMap
 import com.ola.mapsdk.view.OlaMapView
+import `in`.haxon420.ola_maps_flutter_plugin.models.CameraUpdate
+import `in`.haxon420.ola_maps_flutter_plugin.models.EventTypes
+import `in`.haxon420.ola_maps_flutter_plugin.models.LatLng
+import `in`.haxon420.ola_maps_flutter_plugin.models.MarkerOptions
+import `in`.haxon420.ola_maps_flutter_plugin.models.MethodCallFunctionName
+import `in`.haxon420.ola_maps_flutter_plugin.models.OlaMapConfigurations
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.EventChannel.EventSink
@@ -47,7 +49,7 @@ class FlutterOlaMapView internal constructor(
 
     private val initialPos: LatLng = olaMapConfigurations.initialPosition
 
-    private var addedMarkers = hashMapOf<String, OlaMarkerOptions>()
+    private var addedMarkers = hashMapOf<String, Marker?>()
 
     override fun getView(): View {
         return olaMapView
@@ -137,15 +139,15 @@ class FlutterOlaMapView internal constructor(
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            "showCurrentLocation" -> {
+            MethodCallFunctionName.Show_Current_Location -> {
                 map?.showCurrentLocation()
             }
 
-            "hideCurrentLocation" -> {
+            MethodCallFunctionName.Hide_Current_Location -> {
                 map?.hideCurrentLocation()
             }
 
-            "moveCameraToLatLong" -> {
+            MethodCallFunctionName.Move_Camera_To_LatLong -> {
                 val args = call.arguments as Map<*, *>
                 val cameraUpdate: CameraUpdate = CameraUpdate.fromMap(args)
                 map?.moveCameraToLatLong(
@@ -156,7 +158,7 @@ class FlutterOlaMapView internal constructor(
                 )
             }
 
-            "addMarker" -> {
+            MethodCallFunctionName.Add_Marker -> {
                 val args = call.arguments as Map<*, *>
                 val markerOptions: MarkerOptions = MarkerOptions.fromMap(args)
                 val olaMarkerOptions: OlaMarkerOptions =
@@ -170,15 +172,29 @@ class FlutterOlaMapView internal constructor(
                         .setIsAnimationEnable(markerOptions.isAnimationEnabled)
                         .setIsInfoWindowDismissOnClick(markerOptions.isInfoWindowDismissOnClick)
                         .setSnippet(markerOptions.infoWindowSnippet.ifEmpty { null }).build()
-                addedMarkers.put(olaMarkerOptions.markerId,olaMarkerOptions)
-                map?.addMarker(
+                val createdMarker = map?.addMarker(
                     olaMarkerOptions = olaMarkerOptions
                 )
+                addedMarkers.put(olaMarkerOptions.markerId, createdMarker)
             }
 
-            "getZoomLevel" -> {
+            MethodCallFunctionName.Get_Zoom_Level -> {
                 val currentCameraPosition = map?.getCurrentOlaCameraPosition()
                 result.success(currentCameraPosition?.zoomLevel)
+            }
+
+            MethodCallFunctionName.Remove_Marker -> {
+                val markerId = call.arguments as String
+                if (addedMarkers.containsKey(markerId)) {
+                    addedMarkers[markerId]?.removeMarker()
+                    result.success(true)
+                } else {
+                    result.error("marker_not_found", "Marker not found", null)
+                }
+            }
+
+            else -> {
+                throw NotImplementedError("Method ${call.method} is not implemented")
             }
         }
     }

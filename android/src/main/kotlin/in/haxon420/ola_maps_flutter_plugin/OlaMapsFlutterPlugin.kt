@@ -1,4 +1,4 @@
-package com.goapptiv.ola_maps_flutter_plugin
+package `in`.haxon420.ola_maps_flutter_plugin
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 
@@ -7,7 +7,7 @@ class OlaMapsFlutterPlugin : FlutterPlugin {
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         flutterPluginBinding.platformViewRegistry.registerViewFactory(
-            "com.goapptiv.ola_maps_flutter_plugin.OlaMap",
+            "in.haxon420.ola_maps_flutter_plugin.OlaMap",
             OlaMapViewFactory(flutterPluginBinding.binaryMessenger)
         )
     }

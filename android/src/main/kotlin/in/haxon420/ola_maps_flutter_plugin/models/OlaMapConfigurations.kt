@@ -1,4 +1,4 @@
-package com.goapptiv.ola_maps_flutter_plugin.models
+package `in`.haxon420.ola_maps_flutter_plugin.models
 
 data class OlaMapConfigurations(
     val apiKey: String,

@@ -15,7 +15,7 @@ plugins{
     id 'org.jetbrains.kotlin.plugin.serialization' version '2.0.21'
 }
 
-group = "com.goapptiv.ola_maps_flutter_plugin"
+group = "in.haxon420.ola_maps_flutter_plugin"
 version = "1.0-SNAPSHOT"
 
 allprojects {
@@ -33,7 +33,7 @@ apply plugin: "kotlin-android"
 
 android {
     if (project.android.hasProperty("namespace")) {
-        namespace = "com.goapptiv.ola_maps_flutter_plugin"
+        namespace = "in.haxon420.ola_maps_flutter_plugin"
     }
 
     compileSdk = 35

@@ -1,6 +1,6 @@
-package com.goapptiv.ola_maps_flutter_plugin.models
+package `in`.haxon420.ola_maps_flutter_plugin.models
 
-import kotlin.time.Duration
+import kotlin.collections.get
 
 data class CameraUpdate(val target: LatLng, val zoomLevel: Double, val durationInMs: Int){
     companion object{

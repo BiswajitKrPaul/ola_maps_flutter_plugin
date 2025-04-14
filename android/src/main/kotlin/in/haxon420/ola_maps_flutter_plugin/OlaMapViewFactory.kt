@@ -1,7 +1,7 @@
-package com.goapptiv.ola_maps_flutter_plugin
+package `in`.haxon420.ola_maps_flutter_plugin
 
 import android.content.Context
-import com.goapptiv.ola_maps_flutter_plugin.models.OlaMapConfigurations
+import `in`.haxon420.ola_maps_flutter_plugin.models.OlaMapConfigurations
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
@@ -14,10 +14,7 @@ class OlaMapViewFactory(private val messenger: BinaryMessenger) :
         val creationParams = args as Map<*, *>
         val mapConfigurations = OlaMapConfigurations.fromMap(creationParams)
         return FlutterOlaMapView(
-            context,
-            messenger,
-            viewId,
-            olaMapConfigurations = mapConfigurations
+            context, messenger, viewId, olaMapConfigurations = mapConfigurations
         )
     }
 }
