@@ -1,0 +1,94 @@
+buildscript {
+    ext.kotlin_version = "2.0.21"
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.9.1")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+    }
+}
+
+plugins{
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.0.21'
+}
+
+group = "com.goapptiv.ola_maps_flutter_plugin"
+version = "1.0-SNAPSHOT"
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+
+
+
+android {
+    if (project.android.hasProperty("namespace")) {
+        namespace = "com.goapptiv.ola_maps_flutter_plugin"
+    }
+
+    compileSdk = 35
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
+    }
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    dependencies {
+        testImplementation("org.jetbrains.kotlin:kotlin-test")
+        testImplementation("org.mockito:mockito-core:5.1.1")
+        implementation ("androidx.constraintlayout:constraintlayout:2.2.1")
+        implementation ("androidx.cardview:cardview:1.0.0")
+
+        //OlaMap Dependencies
+        implementation 'com.github.BiswajitKrPaul:ola_maps_sdk:v1.0.0'
+
+        implementation ("org.maplibre.gl:android-sdk:10.0.2")
+        implementation ("org.maplibre.gl:android-plugin-annotation-v9:1.0.0")
+        implementation ("org.maplibre.gl:android-plugin-markerview-v9:1.0.0")
+
+        //Plugin Dependencies
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+
+            testLogging {
+               events "passed", "skipped", "failed", "standardOut", "standardError"
+               outputs.upToDateWhen {false}
+               showStandardStreams = true
+            }
+        }
+    }
+}
+
+//dependencies {
+//    // Add AAR file dependency
+//    // implementation fileTree(dir: 'libs', include: ['*.aar'])
+//    compileOnly files('libs/OlaMapSdk-1.6.0.aar')
+//}
