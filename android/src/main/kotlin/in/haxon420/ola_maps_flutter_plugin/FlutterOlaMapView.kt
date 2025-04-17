@@ -9,15 +9,18 @@ import com.ola.mapsdk.interfaces.OlaMapCallback
 import com.ola.mapsdk.listeners.OlaMapsListenerManager
 import com.ola.mapsdk.model.OlaLatLng
 import com.ola.mapsdk.model.OlaMarkerOptions
+import com.ola.mapsdk.model.OlaPolylineOptions
 import com.ola.mapsdk.view.Marker
 import com.ola.mapsdk.view.OlaMap
 import com.ola.mapsdk.view.OlaMapView
+import com.ola.mapsdk.view.Polyline
 import `in`.haxon420.ola_maps_flutter_plugin.models.CameraUpdate
 import `in`.haxon420.ola_maps_flutter_plugin.models.EventTypes
 import `in`.haxon420.ola_maps_flutter_plugin.models.LatLng
 import `in`.haxon420.ola_maps_flutter_plugin.models.MarkerOptions
 import `in`.haxon420.ola_maps_flutter_plugin.models.MethodCallFunctionName
 import `in`.haxon420.ola_maps_flutter_plugin.models.OlaMapConfigurations
+import `in`.haxon420.ola_maps_flutter_plugin.models.PolyLinesOption
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.EventChannel.EventSink
@@ -50,6 +53,7 @@ class FlutterOlaMapView internal constructor(
     private val initialPos: LatLng = olaMapConfigurations.initialPosition
 
     private var addedMarkers = hashMapOf<String, Marker?>()
+    private var addedPolyLines = hashMapOf<String, Polyline?>()
 
     override fun getView(): View {
         return olaMapView
@@ -133,7 +137,7 @@ class FlutterOlaMapView internal constructor(
 
     override fun dispose() {
         methodChannel.setMethodCallHandler(null)
-        eventChannel.setStreamHandler(this)
+        eventChannel.setStreamHandler(null)
     }
 
 
@@ -191,6 +195,87 @@ class FlutterOlaMapView internal constructor(
                     result.success(true)
                 } else {
                     result.error("marker_not_found", "Marker not found", null)
+                }
+            }
+
+            MethodCallFunctionName.AddPolyline -> {
+                val args = call.arguments as Map<*, *>
+                val polylineOptions: PolyLinesOption = PolyLinesOption.fromMap(args)
+                val olaPolyLinesOption =
+                    OlaPolylineOptions.Builder().setPolylineId(polylineOptions.polylineId)
+                        .setPoints(polylineOptions.points.map {
+                            OlaLatLng(
+                                it.latitude, it.longitude
+                            )
+                        } as ArrayList<OlaLatLng>).setLineType(polylineOptions.lineType)
+                        .setColor(polylineOptions.color).setWidth(polylineOptions.width.toFloat())
+                        .build()
+
+                val createdPolyline = map?.addPolyline(olaPolyLinesOption)
+                addedPolyLines.put(polylineOptions.polylineId, createdPolyline)
+            }
+
+            MethodCallFunctionName.RemovePolyline -> {
+                val polylineId = call.arguments as String
+                if (addedPolyLines.containsKey(polylineId)) {
+                    addedPolyLines[polylineId]?.removePolyline()
+                    addedPolyLines.remove(polylineId)
+                    result.success(true)
+                } else {
+                    result.error("polyline_not_found", "Polyline not found", null)
+                }
+            }
+
+            MethodCallFunctionName.UpdatePolylineColor -> {
+                val args = call.arguments as Map<*, *>
+                val polylineId = args["polylineId"] as String
+                val color = args["color"] as String
+                if (addedPolyLines.containsKey(polylineId)) {
+                    addedPolyLines[polylineId]?.setColor(color)
+                    result.success(true)
+                } else {
+                    result.error("polyline_not_found", "Polyline not found", null)
+                }
+            }
+
+            MethodCallFunctionName.UpdatePolylineWidth -> {
+                val args = call.arguments as Map<*, *>
+                val polylineId = args["polylineId"] as String
+                val width = args["width"] as Double
+                if (addedPolyLines.containsKey(polylineId)) {
+                    addedPolyLines[polylineId]?.setWidth(width.toFloat())
+                    result.success(true)
+                } else {
+                    result.error("polyline_not_found", "Polyline not found", null)
+                }
+            }
+
+            MethodCallFunctionName.UpdatePolylinePoints -> {
+                val args = call.arguments as Map<*, *>
+                val polylineId = args["polylineId"] as String
+                val points = args["points"] as List<*>
+                val latlng = points.map { LatLng.from(it as Map<*, *>) }
+                if (addedPolyLines.containsKey(polylineId)) {
+                    addedPolyLines[polylineId]?.setPoints(latlng.map {
+                        OlaLatLng(
+                            it.latitude, it.longitude
+                        )
+                    } as ArrayList<OlaLatLng>)
+                    result.success(true)
+                } else {
+                    result.error("polyline_not_found", "Polyline not found", null)
+                }
+            }
+
+            MethodCallFunctionName.UpdatePolylineLineType -> {
+                val args = call.arguments as Map<*, *>
+                val polylineId = args["polylineId"] as String
+                val lineType = args["lineType"] as String
+                if (addedPolyLines.containsKey(polylineId)) {
+                    addedPolyLines[polylineId]?.setLineType(lineType)
+                    result.success(true)
+                } else {
+                    result.error("polyline_not_found", "Polyline not found", null)
                 }
             }
 

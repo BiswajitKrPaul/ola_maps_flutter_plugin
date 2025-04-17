@@ -17,4 +17,5 @@ class OlaMapViewFactory(private val messenger: BinaryMessenger) :
             context, messenger, viewId, olaMapConfigurations = mapConfigurations
         )
     }
+
 }

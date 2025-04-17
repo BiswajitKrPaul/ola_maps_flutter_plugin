@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ola_maps_flutter_plugin/ola_maps_flutter_plugin.dart';
+import 'package:ola_maps_flutter_plugin/src/common/utils.dart';
 import 'package:ola_maps_flutter_plugin/src/constants.dart';
 import 'package:ola_maps_flutter_plugin/src/models/method_call_functions.dart';
 
@@ -11,6 +12,12 @@ abstract class OlaMapController {
   Future<double> getZoomLevel();
   void addMarker(MarkerOptions latlng);
   Future<bool> removeMarker(String markerId);
+  Future<void> addPolylines(PolylineOptions polylineOptions);
+  Future<bool> removePolyline(String polylineId);
+  Future<bool> updatePolylinePoints(String polylineId, List<LatLng> points);
+  Future<bool> updatePolylineColor(String polylineId, Color color);
+  Future<bool> updatePolylineWidth(String polylineId, double width);
+  Future<bool> updatePolylineLineType(String polylineId, String lineType);
 }
 
 class OlaMapControllerInternal implements OlaMapController {
@@ -90,5 +97,58 @@ class OlaMapControllerInternal implements OlaMapController {
       markerId,
     );
     return Future.value(data);
+  }
+
+  @override
+  Future<void> addPolylines(PolylineOptions polylineOptions) async {
+    return await methodChannel.invokeMethod(
+      MethodCallFunctions.addPolyline,
+      polylineOptions.toMap(),
+    );
+  }
+
+  @override
+  Future<bool> removePolyline(String polylineId) async {
+    return await methodChannel.invokeMethod(
+      MethodCallFunctions.removePolyline,
+      polylineId,
+    );
+  }
+
+  @override
+  Future<bool> updatePolylineColor(String polylineId, Color color) async {
+    return await methodChannel.invokeMethod(
+      MethodCallFunctions.updatePolylineColor,
+      {"polylineId": polylineId, "color": Utils.getHexColorCode(color)},
+    );
+  }
+
+  @override
+  Future<bool> updatePolylineLineType(
+      String polylineId, String lineType) async {
+    return await methodChannel.invokeMethod(
+      MethodCallFunctions.updatePolylineColor,
+      {"polylineId": polylineId, "lineType": lineType},
+    );
+  }
+
+  @override
+  Future<bool> updatePolylinePoints(
+      String polylineId, List<LatLng> points) async {
+    return await methodChannel.invokeMethod(
+      MethodCallFunctions.updatePolylinePoints,
+      {
+        "polylineId": polylineId,
+        "points": points.map((x) => x.toMap()).toList()
+      },
+    );
+  }
+
+  @override
+  Future<bool> updatePolylineWidth(String polylineId, double width) async {
+    return await methodChannel.invokeMethod(
+      MethodCallFunctions.updatePolylineWidth,
+      {"polylineId": polylineId, "width": width},
+    );
   }
 }

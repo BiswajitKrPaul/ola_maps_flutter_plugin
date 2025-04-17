@@ -5,14 +5,17 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 /** OlaMapsFlutterPlugin */
 class OlaMapsFlutterPlugin : FlutterPlugin {
 
+    private var olaMapViewFactory: OlaMapViewFactory? = null
+
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+
+        olaMapViewFactory = OlaMapViewFactory(flutterPluginBinding.binaryMessenger)
         flutterPluginBinding.platformViewRegistry.registerViewFactory(
-            "in.haxon420.ola_maps_flutter_plugin.OlaMap",
-            OlaMapViewFactory(flutterPluginBinding.binaryMessenger)
+            "in.haxon420.ola_maps_flutter_plugin.OlaMap", olaMapViewFactory!!
         )
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        TODO("NOT yet implemented")
+        olaMapViewFactory = null
     }
 }

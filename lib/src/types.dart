@@ -1,7 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:ola_maps_flutter_plugin/ola_maps_flutter_plugin.dart';
+import 'package:ola_maps_flutter_plugin/src/common/utils.dart';
 
 typedef OlaMapCreatedCallback = void Function(OlaMapController controller);
 
@@ -135,4 +137,49 @@ class MarkerOptions {
 
   factory MarkerOptions.fromJson(String source) =>
       MarkerOptions.fromMap(json.decode(source) as Map<String, dynamic>);
+}
+
+class PolylineOptions {
+  final String id;
+  final List<LatLng> points;
+  final Color color;
+  final double width;
+  final String? lineType;
+
+  PolylineOptions({
+    required this.id,
+    required this.points,
+    required this.color,
+    required this.width,
+    this.lineType,
+  });
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'points': points.map((x) => x.toMap()).toList(),
+      'color': Utils.getHexColorCode(color),
+      'width': width,
+      'lineType': lineType,
+    };
+  }
+
+  factory PolylineOptions.fromMap(Map<String, dynamic> map) {
+    return PolylineOptions(
+      id: map['id'] as String,
+      points: List<LatLng>.from(
+        (map['points'] as List<int>).map<LatLng>(
+          (x) => LatLng.fromMap(x as Map<dynamic, dynamic>),
+        ),
+      ),
+      color: map['color'],
+      width: map['width'],
+      lineType: map['lineType'] != null ? map['lineType'] as String : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory PolylineOptions.fromJson(String source) =>
+      PolylineOptions.fromMap(json.decode(source) as Map<String, dynamic>);
 }

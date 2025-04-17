@@ -8,4 +8,10 @@ object MethodCallFunctionName {
     const val Add_Marker = "addMarker"
     const val Get_Zoom_Level = "getZoomLevel"
     const val Remove_Marker = "removeMarker"
+    const val AddPolyline = "addPolyline"
+    const val RemovePolyline = "removePolyline"
+    const val UpdatePolylineColor = "updatePolylineColor"
+    const val UpdatePolylinePoints = "updatePolylinePoints"
+    const val UpdatePolylineWidth = "updatePolylineWidth"
+    const val UpdatePolylineLineType = "updatePolylineLineType"
 }
