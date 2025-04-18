@@ -7,9 +7,12 @@ import com.ola.mapsdk.camera.MapControlSettings
 import com.ola.mapsdk.interfaces.MarkerEventListener
 import com.ola.mapsdk.interfaces.OlaMapCallback
 import com.ola.mapsdk.listeners.OlaMapsListenerManager
+import com.ola.mapsdk.model.BorderOptions
+import com.ola.mapsdk.model.OlaCircleOptions
 import com.ola.mapsdk.model.OlaLatLng
 import com.ola.mapsdk.model.OlaMarkerOptions
 import com.ola.mapsdk.model.OlaPolylineOptions
+import com.ola.mapsdk.view.Circle
 import com.ola.mapsdk.view.Marker
 import com.ola.mapsdk.view.OlaMap
 import com.ola.mapsdk.view.OlaMapView
@@ -17,6 +20,7 @@ import com.ola.mapsdk.view.Polyline
 import `in`.haxon420.ola_maps_flutter_plugin.models.CameraUpdate
 import `in`.haxon420.ola_maps_flutter_plugin.models.EventTypes
 import `in`.haxon420.ola_maps_flutter_plugin.models.LatLng
+import `in`.haxon420.ola_maps_flutter_plugin.models.MapCircleOptions
 import `in`.haxon420.ola_maps_flutter_plugin.models.MarkerOptions
 import `in`.haxon420.ola_maps_flutter_plugin.models.MethodCallFunctionName
 import `in`.haxon420.ola_maps_flutter_plugin.models.OlaMapConfigurations
@@ -54,6 +58,7 @@ class FlutterOlaMapView internal constructor(
 
     private var addedMarkers = hashMapOf<String, Marker?>()
     private var addedPolyLines = hashMapOf<String, Polyline?>()
+    private var addedCircles = hashMapOf<Long, Circle?>()
 
     override fun getView(): View {
         return olaMapView
@@ -277,6 +282,35 @@ class FlutterOlaMapView internal constructor(
                 } else {
                     result.error("polyline_not_found", "Polyline not found", null)
                 }
+            }
+
+            MethodCallFunctionName.AddCircle -> {
+                val args = call.arguments as Map<*, *>
+                val circleOptions: MapCircleOptions = MapCircleOptions.fromMap(args)
+                var borderOptions: BorderOptions? = null
+                if (circleOptions.borderOptions != null) {
+                    borderOptions = BorderOptions.Builder()
+                        .setBorderColor(circleOptions.borderOptions.borderColor)
+                        .setBorderWidth(circleOptions.borderOptions.borderWidth.toFloat())
+                        .setBorderLineType(circleOptions.borderOptions.borderLineType)
+                        .setBorderLineDashArray(circleOptions.borderOptions.borderLineDashArray?.map { it.toFloat() }
+                            ?.toTypedArray()).build()
+                }
+                val olaCircleOptionsBuilder =
+                    OlaCircleOptions.Builder().setCircleId(circleOptions.circleId)
+                        .setCircleBlur(circleOptions.circleBlur.toFloat())
+                        .setCircleOpacity(circleOptions.circleOpacity.toFloat())
+                        .setColorHexCode(circleOptions.colorHexCode)
+                        .setRadius(circleOptions.radius.toFloat()).setOlaLatLng(
+                            OlaLatLng(
+                                latitude = circleOptions.latLng.latitude,
+                                longitude = circleOptions.latLng.longitude
+                            )
+                        )
+                if (borderOptions != null) olaCircleOptionsBuilder.setBorderOptions(borderOptions)
+                val olaCircleOptions = olaCircleOptionsBuilder.build()
+                val createdCircle = map?.addCircle(olaCircleOptions)
+                addedCircles.put(circleOptions.circleId, createdCircle)
             }
 
             else -> {

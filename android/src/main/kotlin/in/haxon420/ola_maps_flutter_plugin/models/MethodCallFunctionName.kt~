@@ -16,6 +16,4 @@ object MethodCallFunctionName {
     const val UpdatePolylineLineType = "updatePolylineLineType"
     const val AddCircle = "addCircle"
     const val RemoveCircle = "removeCircle"
-    const val UpdateCircleColor = "updateCircleColor"
-    const val UpdateCircleRadius = "updateCircleRadius"
 }

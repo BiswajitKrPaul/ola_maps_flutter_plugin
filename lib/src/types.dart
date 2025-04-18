@@ -183,3 +183,90 @@ class PolylineOptions {
   factory PolylineOptions.fromJson(String source) =>
       PolylineOptions.fromMap(json.decode(source) as Map<String, dynamic>);
 }
+
+class MapBorderOptions {
+  final String borderColor;
+  final double borderWidth;
+  final String? borderLineType;
+  final List<double>? borderLineDashArray;
+
+  MapBorderOptions({
+    required this.borderColor,
+    required this.borderWidth,
+    this.borderLineType,
+    this.borderLineDashArray,
+  });
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'borderColor': borderColor,
+      'borderWidth': borderWidth,
+      'borderLineType': borderLineType,
+      'borderLineDashArray': borderLineDashArray,
+    };
+  }
+
+  factory MapBorderOptions.fromMap(Map<String, dynamic> map) {
+    return MapBorderOptions(
+      borderColor: map['borderColor'] as String,
+      borderWidth: map['borderWidth'] as double,
+      borderLineType: map['borderLineType'] != null
+          ? map['borderLineType'] as String
+          : null,
+      borderLineDashArray: map['borderLineDashArray'] != null
+          ? List<double>.from((map['borderLineDashArray'] as List<double>))
+          : null,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory MapBorderOptions.fromJson(String source) =>
+      MapBorderOptions.fromMap(json.decode(source) as Map<String, dynamic>);
+}
+
+class MapCircleOptions {
+  final Color colorHexCode;
+  final LatLng latLng;
+  final double radius;
+  final double circleOpacity;
+  final double circleBlur;
+  final int circleId;
+  final MapBorderOptions? borderOptions;
+
+  MapCircleOptions({
+    required this.colorHexCode,
+    required this.latLng,
+    required this.radius,
+    required this.circleOpacity,
+    required this.circleBlur,
+    required this.circleId,
+    this.borderOptions,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'colorHexCode': Utils.getHexColorCode(colorHexCode),
+      'latLng': latLng.toMap(),
+      'radius': radius,
+      'circleOpacity': circleOpacity,
+      'circleBlur': circleBlur,
+      'circleId': circleId,
+      'borderOptions': borderOptions?.toMap(),
+    };
+  }
+
+  factory MapCircleOptions.fromMap(Map<dynamic, dynamic> map) {
+    return MapCircleOptions(
+      colorHexCode: map['colorHexCode'],
+      latLng: LatLng.fromMap(map['latLng'] as Map<dynamic, dynamic>),
+      radius: map['radius'] as double,
+      circleOpacity: map['circleOpacity'] as double,
+      circleBlur: map['circleBlur'] as double,
+      circleId: map['circleId'] as int,
+      borderOptions: map['borderOptions'] != null
+          ? MapBorderOptions.fromMap(
+              map['borderOptions'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}

@@ -18,6 +18,7 @@ abstract class OlaMapController {
   Future<bool> updatePolylineColor(String polylineId, Color color);
   Future<bool> updatePolylineWidth(String polylineId, double width);
   Future<bool> updatePolylineLineType(String polylineId, String lineType);
+  Future<void> addCircle(MapCircleOptions circleOptions);
 }
 
 class OlaMapControllerInternal implements OlaMapController {
@@ -150,5 +151,11 @@ class OlaMapControllerInternal implements OlaMapController {
       MethodCallFunctions.updatePolylineWidth,
       {"polylineId": polylineId, "width": width},
     );
+  }
+
+  @override
+  Future<void> addCircle(MapCircleOptions circleOptions) async {
+    return await methodChannel.invokeMethod(
+        MethodCallFunctions.addCircle, circleOptions.toMap());
   }
 }

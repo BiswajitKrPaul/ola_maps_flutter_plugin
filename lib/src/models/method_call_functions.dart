@@ -11,4 +11,5 @@ class MethodCallFunctions {
   static const String updatePolylinePoints = "updatePolylinePoints";
   static const String updatePolylineWidth = "updatePolylineWidth";
   static const String updatePolylineLineType = "updatePolylineLineType";
+  static const String addCircle = "addCircle";
 }
